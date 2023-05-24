@@ -1,0 +1,14 @@
+.elements__like {
+    width: 22px;
+    height: 19px;
+    background: url("../../../images/vector-like.svg") center center no-repeat;
+    border: none;
+    padding: 0;
+    margin-bottom: 3px;
+}
+
+.elements__like:hover {
+    cursor: pointer;
+    opacity: 0.5;
+    transition-duration: .5s;
+}
