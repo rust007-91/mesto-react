@@ -15,10 +15,9 @@ function Main({ onEditAvatar, onEditProfile, onAddPlace, onCardClick, onCardLike
                 <div className="profile__container">
                     <button onClick={ onEditAvatar } className="profile__avatar-button">
                         <img
-                            src={avatar}
+                            src={ currentUser.avatar }
                             alt="Аватарка"
                             className="profile__avatar-image"
-                            style={{ backgroundImage: `url(${currentUser.avatar})` }}
                         />
                     </button>
                     <div className="profile__info">

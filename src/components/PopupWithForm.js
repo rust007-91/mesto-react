@@ -1,5 +1,5 @@
 function PopupWithForm(props) {
-    const { title, name, btnText, isOpen, onClose } = props;
+    const { title, name, btnText, isOpen, onClose, onSubmit } = props;
 
     return (
         <>
@@ -9,6 +9,7 @@ function PopupWithForm(props) {
                         className="popup__form popup__form_edit"
                         name={`form-${ name }`}
                         noValidate
+                        onSubmit={ onSubmit }
                     >
                         <h2 className="popup__form-heading">{ title }</h2>
                         { props.children }

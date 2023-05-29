@@ -7,6 +7,8 @@ import Main from "./Main";
 import Footer from "./Footer";
 import PopupWithForm from "./PopupWithForm";
 import ImagePopup from "./ImagePopup";
+import EditProfilePopup from "./EditProfilePopup";
+import EditAvatarPopup from "./EditAvatarPopup";
 
 function App() {
   const [isEditAvatarPopupOpen, setEditAvatarState] = useState(false); // хук открытия формы аватара
@@ -18,7 +20,6 @@ function App() {
   const [cards, setCards] = useState([]); // хук запись данных карточек
 
   useEffect(() => {
-
     Promise.all([api.getApiInfo(), api.getApiCard()])
         .then((dataList) => {
           const [dataInfo, dataCards] = dataList; // диструктурируем полученный массив данных
@@ -55,7 +56,7 @@ function App() {
   };
 
   // Обработчик лайков
-  function handleCardLike(card) {
+  const handleCardLike = (card) => {
     // Снова проверяем, есть ли уже лайк на этой карточке
     const isLiked = card.likes.some(i => i._id === currentUser._id);
 
@@ -63,16 +64,38 @@ function App() {
     api.changeLikeCardStatus(card._id, !isLiked)
         .then((newCard) => {
           setCards((state) => state.map((c) => c._id === card._id ? newCard : c));
-        });
+        })
+        .catch((err) => alert(err));
   }
 
   // Обработчик лайков
-  function handleCardDelete(card) {
+  const handleCardDelete = (card) => {
     // Отправляем запрос в API и получаем обновлённые данные карточки
     api.deleteApiCard(card._id)
         .then((newCard) => {
           setCards((state) => state.filter((c) => c._id !== card._id));
-        });
+        })
+        .catch((err) => alert(err));
+  }
+
+  //обработчик обновления и закрытия формы редактирования
+  const handleUpdateUser = (user) => {
+    api.setApiInfo(user)
+        .then((dataInfo) => {
+          setCurrentUser(dataInfo);
+          closeAllPopups();
+        })
+        .catch((err) => alert(err));
+  }
+
+  //обработчик обновления и закрытия формы аватара
+  const handleUpdateAvatar = (avatar) => {
+    api.setApiAvatar(avatar)
+        .then((dataInfo) => {
+          setCurrentUser(dataInfo);
+          closeAllPopups();
+        })
+        .catch((err) => alert(err));
   }
 
   return (
@@ -93,67 +116,17 @@ function App() {
 
             <Footer />
 
-            <PopupWithForm
-                title="Обновить аватар"
-                name="avatar"
-                btnText="Сохранить"
-                isOpen={ isEditAvatarPopupOpen }
-                onClose={ closeAllPopups }
-            >
-              <fieldset className="popup__form-fieldset">
-                <input
-                    id="desc_avatar"
-                    type="url"
-                    className="popup__input popup__input_type_avatar"
-                    name="link"
-                    placeholder="Ссылка на картинку"
-                    required
-                />
-                <span
-                    className="error-message error-message_active"
-                    id="desc_avatar-error"
-                ></span>
-              </fieldset>
-            </PopupWithForm>
-
-            <PopupWithForm
-                title="Редактировать профиль"
-                name="edit"
-                btnText="Сохранить"
+            <EditProfilePopup
                 isOpen={ isEditProfilePopupOpen }
                 onClose={ closeAllPopups }
-            >
-              <fieldset className="popup__form-fieldset popup__form-fieldset_edit">
-                <input
-                    id="heading_edit"
-                    type="text"
-                    className="popup__input popup__input_type_edit-name"
-                    name="heading"
-                    placeholder="Введите имя"
-                    minLength="2"
-                    maxLength="40"
-                    required
-                />
-                <span
-                    className="error-message error-message_active"
-                    id="heading_edit-error"
-                ></span>
-                <input
-                    id="desc_edit"
-                    type="text"
-                    className="popup__input popup__input_type_edit-job"
-                    name="desc"
-                    placeholder="Введите род деятельности"
-                    minLength="2"
-                    maxLength="200"
-                    required
-                />
-                <span
-                    className="error-message error-message_active"
-                    id="desc_edit-error"
-                ></span>
-              </fieldset>
-            </PopupWithForm>
+                onUpdateUser={ handleUpdateUser }
+            />
+
+            <EditAvatarPopup
+                isOpen={ isEditAvatarPopupOpen }
+                onClose={ closeAllPopups }
+                onUpdateAvatar={ handleUpdateAvatar }
+            />
 
             <PopupWithForm
                 title="Новое место"

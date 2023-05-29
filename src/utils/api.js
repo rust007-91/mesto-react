@@ -32,24 +32,24 @@ class Api {
     }
 
     // Метод обновления информации о пользователе на сервере
-    setApiInfo({ heading, desc }) {
+    setApiInfo({ name, about }) {
         return this._request(`${this._url}users/me`, {
             method: "PATCH",
             headers: this._headers,
             body: JSON.stringify({
-                name: heading,
-                about: desc,
+                name: name,
+                about: about,
             }),
         });
     }
 
     // Метод обновления аватара о пользователе на сервере
-    setApiAvatar({ link }) {
+    setApiAvatar({ avatar }) {
         return this._request(`${this._url}users/me/avatar`, {
             method: "PATCH",
             headers: this._headers,
             body: JSON.stringify({
-                avatar: link,
+                avatar: avatar,
             }),
         });
     }
