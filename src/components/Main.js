@@ -1,46 +1,30 @@
-import avatar from "../images/kusto-avatar.jpg";
-import api from "../utils/api";
-import { useEffect, useState } from "react";
+import { useContext } from "react";
+import { CurrentUserContext } from "../contexts/CurrentUserContext";
+import { CurrentCardContext } from "../contexts/CurrentCardContext";
 import Card from "./Card";
+import avatar from "../images/kusto-avatar.jpg";
 
-function Main({ onEditAvatar, onEditProfile, onAddPlace, onCardClick }) {
-    const [userName, setUserName] = useState("");
-    const [userDescription, setUserDescription] = useState("");
-    const [userAvatar, setUserAvatar] = useState({});
-    const [cards, setCards] = useState([]);
+function Main({ onEditAvatar, onEditProfile, onAddPlace, onCardClick, onCardLike, onCardDelete }) {
 
-    useEffect(() => {
-        Promise.all([api.getApiInfo(), api.getApiCard()])
-            .then((dataList) => {
-                const [dataInfo, dataCards] = dataList; // диструктурируем полученный массив данных
-                // установка данных профиля
-                setUserName(dataInfo.name);
-                setUserDescription(dataInfo.about);
-                setUserAvatar(dataInfo.avatar);
-                // рендер карточек
-                setCards(dataCards);
-            })
-            .catch((err) => alert(err));
-    }, []);
-
-
+    const currentUser = useContext(CurrentUserContext);   //Подписка на контекст CurrentUserContext
+    const cards = useContext(CurrentCardContext);   //Подписка на контекст CurrentCardContext
 
     return (
         <main>
             <section className="profile">
                 <div className="profile__container">
-                    <button onClick={onEditAvatar} className="profile__avatar-button">
+                    <button onClick={ onEditAvatar } className="profile__avatar-button">
                         <img
                             src={avatar}
                             alt="Аватарка"
                             className="profile__avatar-image"
-                            style={{ backgroundImage: `url(${userAvatar})` }}
+                            style={{ backgroundImage: `url(${currentUser.avatar})` }}
                         />
                     </button>
                     <div className="profile__info">
                         <div className="profile__text-wrapper">
-                            <h1 className="profile__title">{userName}</h1>
-                            <p className="profile__description">{userDescription}</p>
+                            <h1 className="profile__title">{ currentUser.name }</h1>
+                            <p className="profile__description">{ currentUser.about }</p>
                         </div>
                         <button
                             onClick={onEditProfile}
@@ -60,10 +44,17 @@ function Main({ onEditAvatar, onEditProfile, onAddPlace, onCardClick }) {
             <section className="elements">
                 <ul className="elements__list">
                     {cards.map((card) => {
+                        const isOwn = card.owner._id === currentUser._id; // Определяем, являемся ли мы владельцем текущей карточки
+                        const isLiked = card.likes.some(i => i._id === currentUser._id); // Определяем, есть ли у карточки лайк, поставленный текущим пользователем
                         return (
-                            <Card key={card._id}
-                                  card={card}
-                                  onCardClick={onCardClick} />
+                            <Card key={ card._id }
+                                  card={ card }
+                                  isOwn={ isOwn }
+                                  isLiked={ isLiked }
+                                  onCardClick={ onCardClick }
+                                  onCardLike={ onCardLike }
+                                  onCardDelete={ onCardDelete }
+                            />
                         );
                     })}
                 </ul>

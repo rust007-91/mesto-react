@@ -73,18 +73,11 @@ class Api {
             headers: this._headers,
         });
     }
-    // Метод добавления лайка на сервер
-    setApiLike(id) {
-        return this._request(`${this._url}cards/${id}/likes`, {
-            method: "PUT",
-            headers: this._headers,
-        });
-    }
 
-    // Метод удаления лайка на сервер
-    deleteApiLike(id) {
+    // Метод обработки лайков на сервере
+    changeLikeCardStatus(id, isLiked) {
         return this._request(`${this._url}cards/${id}/likes`, {
-            method: "DELETE",
+            method: isLiked ? "PUT":"DELETE",
             headers: this._headers,
         });
     }
