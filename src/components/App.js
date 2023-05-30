@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { CurrentUserContext } from "../contexts/CurrentUserContext";
 import { CurrentCardContext } from "../contexts/CurrentCardContext";
+import { CurrentLoadingContext } from "../contexts/CurrentLoadingContext";
 import api from "../utils/api";
 import Header from "./Header";
 import Main from "./Main";
@@ -9,15 +10,18 @@ import PopupWithForm from "./PopupWithForm";
 import ImagePopup from "./ImagePopup";
 import EditProfilePopup from "./EditProfilePopup";
 import EditAvatarPopup from "./EditAvatarPopup";
+import AddPlacePopup from "./AddPlacePopup";
 
 function App() {
-  const [isEditAvatarPopupOpen, setEditAvatarState] = useState(false); // хук открытия формы аватара
-  const [isEditProfilePopupOpen, setEditProfileState] = useState(false); // хук открытия формы редактирования
-  const [isAddPlacePopupOpen, setAddPlaceState] = useState(false); // хук открытия формы добавления карты
-  const [isImagePopupOpen, setImagePopupOpen] = useState(false); // хук проброса выбранной карточки
+  const [isEditAvatarPopupOpen, setEditAvatarState] = useState(false);  // хук открытия формы аватара
+  const [isEditProfilePopupOpen, setEditProfileState] = useState(false);    // хук открытия формы редактирования
+  const [isAddPlacePopupOpen, setAddPlaceState] = useState(false);  // хук открытия формы добавления карты
+  const [isImagePopupOpen, setImagePopupOpen] = useState(false);    // хук проброса выбранной карточки
   const [selectedCard, setSelectedCard] = useState({}); // хук открытия выбранной карточки в попап
-  const [currentUser, setCurrentUser] = useState({}); // хук запись данных пользователя
-  const [cards, setCards] = useState([]); // хук запись данных карточек
+  const [currentUser, setCurrentUser] = useState({});   // хук запись данных пользователя
+  const [cards, setCards] = useState([]);   // хук запись данных карточек
+  const [isLoading, setLoading] = useState(false);
+
 
   useEffect(() => {
     Promise.all([api.getApiInfo(), api.getApiCard()])
@@ -63,7 +67,7 @@ function App() {
     // Отправляем запрос в API и получаем обновлённые данные карточки
     api.changeLikeCardStatus(card._id, !isLiked)
         .then((newCard) => {
-          setCards((state) => state.map((c) => c._id === card._id ? newCard : c));
+            setCards((state) => state.map((c) => c._id === card._id ? newCard : c));
         })
         .catch((err) => alert(err));
   }
@@ -73,29 +77,53 @@ function App() {
     // Отправляем запрос в API и получаем обновлённые данные карточки
     api.deleteApiCard(card._id)
         .then((newCard) => {
-          setCards((state) => state.filter((c) => c._id !== card._id));
+            setCards((state) => state.filter((c) => c._id !== card._id));
         })
         .catch((err) => alert(err));
   }
 
   //обработчик обновления и закрытия формы редактирования
   const handleUpdateUser = (user) => {
-    api.setApiInfo(user)
+      setLoading(true);
+    api
+        .setApiInfo(user)
         .then((dataInfo) => {
-          setCurrentUser(dataInfo);
-          closeAllPopups();
+            setCurrentUser(dataInfo);
+            closeAllPopups();
         })
-        .catch((err) => alert(err));
+        .catch((err) => alert(err))
+        .finally(() => {
+            setLoading(false);
+        });
   }
 
   //обработчик обновления и закрытия формы аватара
   const handleUpdateAvatar = (avatar) => {
-    api.setApiAvatar(avatar)
+      setLoading(true);
+    api
+        .setApiAvatar(avatar)
         .then((dataInfo) => {
-          setCurrentUser(dataInfo);
-          closeAllPopups();
+            setCurrentUser(dataInfo);
+            closeAllPopups();
         })
-        .catch((err) => alert(err));
+        .catch((err) => alert(err))
+        .finally(() => {
+          setLoading(false);
+        });
+  }
+
+  const handleAddPlaceSubmit = (card) => {
+      setLoading(true);
+      api
+          .setApiNewCard(card)
+          .then((newCard) => {
+              setCards([newCard, ...cards]);
+              closeAllPopups();
+          })
+          .catch((err) => alert(err))
+          .finally(() => {
+              setLoading(false);
+          });
   }
 
   return (
@@ -116,56 +144,32 @@ function App() {
 
             <Footer />
 
-            <EditProfilePopup
-                isOpen={ isEditProfilePopupOpen }
-                onClose={ closeAllPopups }
-                onUpdateUser={ handleUpdateUser }
-            />
+            <CurrentLoadingContext.Provider value={isLoading}>
+                <EditProfilePopup
+                    isOpen={ isEditProfilePopupOpen }
+                    onClose={ closeAllPopups }
+                    onUpdateUser={ handleUpdateUser }
+                />
 
-            <EditAvatarPopup
-                isOpen={ isEditAvatarPopupOpen }
-                onClose={ closeAllPopups }
-                onUpdateAvatar={ handleUpdateAvatar }
-            />
+                <EditAvatarPopup
+                    isOpen={ isEditAvatarPopupOpen }
+                    onClose={ closeAllPopups }
+                    onUpdateAvatar={ handleUpdateAvatar }
+                />
+
+                <AddPlacePopup
+                    isOpen={ isAddPlacePopupOpen }
+                    onClose={ closeAllPopups }
+                    onAddPlace={ handleAddPlaceSubmit }
+                />
+            </CurrentLoadingContext.Provider>
+
 
             <PopupWithForm
-                title="Новое место"
-                name="add"
-                btnText="Создать"
-                isOpen={ isAddPlacePopupOpen }
-                onClose={ closeAllPopups }
-            >
-              <fieldset className="popup__form-fieldset popup__form-fieldset_add">
-                <input
-                    id="heading_add"
-                    type="text"
-                    className="popup__input popup__input_type_add-name"
-                    name="name"
-                    placeholder="Название"
-                    required
-                    minLength="2"
-                    maxLength="30"
-                />
-                <span
-                    className="error-message error-message_active"
-                    id="heading_add-error"
-                ></span>
-                <input
-                    id="desc_add"
-                    type="url"
-                    className="popup__input popup__input_type_add-img"
-                    name="link"
-                    placeholder="Ссылка на картинку"
-                    required
-                />
-                <span
-                    className="error-message error-message_active"
-                    id="desc_add-error"
-                ></span>
-              </fieldset>
-            </PopupWithForm>
-
-            <PopupWithForm title="Вы уверены?" name="confirm" btnText="Да" />
+                title="Вы уверены?"
+                name="confirm"
+                btnText="Да"
+            />
 
             <ImagePopup
                 card={ selectedCard }

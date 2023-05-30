@@ -2,7 +2,6 @@ import { useContext } from "react";
 import { CurrentUserContext } from "../contexts/CurrentUserContext";
 import { CurrentCardContext } from "../contexts/CurrentCardContext";
 import Card from "./Card";
-import avatar from "../images/kusto-avatar.jpg";
 
 function Main({ onEditAvatar, onEditProfile, onAddPlace, onCardClick, onCardLike, onCardDelete }) {
 
@@ -26,7 +25,7 @@ function Main({ onEditAvatar, onEditProfile, onAddPlace, onCardClick, onCardLike
                             <p className="profile__description">{ currentUser.about }</p>
                         </div>
                         <button
-                            onClick={onEditProfile}
+                            onClick={ onEditProfile }
                             className="profile__edit-button"
                             type="button"
                             aria-label="кнопка редактировать"
@@ -34,7 +33,7 @@ function Main({ onEditAvatar, onEditProfile, onAddPlace, onCardClick, onCardLike
                     </div>
                 </div>
                 <button
-                    onClick={onAddPlace}
+                    onClick={ onAddPlace }
                     className="profile__add-button"
                     type="button"
                     aria-label="кнопка добавить"
@@ -42,20 +41,16 @@ function Main({ onEditAvatar, onEditProfile, onAddPlace, onCardClick, onCardLike
             </section>
             <section className="elements">
                 <ul className="elements__list">
-                    {cards.map((card) => {
-                        const isOwn = card.owner._id === currentUser._id; // Определяем, являемся ли мы владельцем текущей карточки
-                        const isLiked = card.likes.some(i => i._id === currentUser._id); // Определяем, есть ли у карточки лайк, поставленный текущим пользователем
+                    { cards.map((card) => {
                         return (
                             <Card key={ card._id }
                                   card={ card }
-                                  isOwn={ isOwn }
-                                  isLiked={ isLiked }
                                   onCardClick={ onCardClick }
                                   onCardLike={ onCardLike }
                                   onCardDelete={ onCardDelete }
                             />
                         );
-                    })}
+                    }) }
                 </ul>
             </section>
         </main>

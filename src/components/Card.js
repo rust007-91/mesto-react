@@ -1,4 +1,15 @@
-function Card({ card, isOwn, isLiked, onCardClick, onCardLike, onCardDelete }) {
+import {useContext} from "react";
+import {CurrentUserContext} from "../contexts/CurrentUserContext";
+
+function Card({ card, onCardClick, onCardLike, onCardDelete }) {
+
+    const currentUser = useContext(CurrentUserContext);
+
+    // Определяем, являемся ли мы владельцем текущей карточки
+    const isOwn = card.owner._id === currentUser._id;
+    // Определяем, есть ли у карточки лайк, поставленный текущим пользователем
+    const isLiked = card.likes.some(i => i._id === currentUser._id);
+
     // обработчик для прокидывания выбранной карточки
     function handleClick() {
         onCardClick(card);

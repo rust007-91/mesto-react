@@ -6,7 +6,7 @@ function PopupWithForm(props) {
             <div className={`popup popup_${ name } ${ isOpen && "popup_opened" }`}>
                 <div className="popup__container">
                     <form
-                        className="popup__form popup__form_edit"
+                        className={`popup__form popup__form_${ name }`}
                         name={`form-${ name }`}
                         noValidate
                         onSubmit={ onSubmit }

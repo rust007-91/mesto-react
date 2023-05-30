@@ -1,9 +1,11 @@
 import PopupWithForm from "./PopupWithForm";
 import {useContext, useEffect, useState} from "react";
 import {CurrentUserContext} from "../contexts/CurrentUserContext";
+import {CurrentLoadingContext} from "../contexts/CurrentLoadingContext";
 
 function EditProfilePopup({isOpen, onClose, onUpdateUser}) {
     const currentUser = useContext(CurrentUserContext); // подписка на контекст
+    const isLoading = useContext(CurrentLoadingContext);
 
     // стэйты полей редактирования
     const [name, setName] = useState("");
@@ -19,8 +21,8 @@ function EditProfilePopup({isOpen, onClose, onUpdateUser}) {
 
     //добавление и рендер введёных данных
     useEffect(() => {
-        setName(currentUser.name);
-        setDescription(currentUser.about);
+        setName(currentUser.name || "");
+        setDescription(currentUser.about || "");
     }, [currentUser]);
 
     //обработчик формы для передачи данных в запрос на сервер
@@ -38,7 +40,7 @@ function EditProfilePopup({isOpen, onClose, onUpdateUser}) {
         <PopupWithForm
             title="Редактировать профиль"
             name="edit"
-            btnText="Сохранить"
+            btnText={ isLoading ? "Сохранение..." : "Сохранить"}
             isOpen={ isOpen }
             onClose={ onClose }
             onSubmit={ handleSubmit }
@@ -54,7 +56,7 @@ function EditProfilePopup({isOpen, onClose, onUpdateUser}) {
                     maxLength="40"
                     required
                     onChange={ handleInputName }
-                    value={ name ?? "" }
+                    value={ name }
                 />
                 <span
                     className="error-message error-message_active"
@@ -70,7 +72,7 @@ function EditProfilePopup({isOpen, onClose, onUpdateUser}) {
                     maxLength="200"
                     required
                     onChange={ handleInputDescription }
-                    value={ description ?? "" }
+                    value={ description }
                 />
                 <span
                     className="error-message error-message_active"
