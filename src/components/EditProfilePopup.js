@@ -1,9 +1,9 @@
 import PopupWithForm from "./PopupWithForm";
-import {useContext, useEffect, useState} from "react";
-import {CurrentUserContext} from "../contexts/CurrentUserContext";
-import {CurrentLoadingContext} from "../contexts/CurrentLoadingContext";
+import { useContext, useEffect, useState } from "react";
+import { CurrentUserContext } from "../contexts/CurrentUserContext";
+import { CurrentLoadingContext } from "../contexts/CurrentLoadingContext";
 
-function EditProfilePopup({isOpen, onClose, onUpdateUser}) {
+function EditProfilePopup({ isOpen, onClose, onUpdateUser }) {
     const currentUser = useContext(CurrentUserContext); // подписка на контекст
     const isLoading = useContext(CurrentLoadingContext);
 
@@ -14,16 +14,16 @@ function EditProfilePopup({isOpen, onClose, onUpdateUser}) {
     //обработчики ввода данных в поля
     const handleInputName = (evt) => {
         setName(evt.target.value);
-    }
+    };
     const handleInputDescription = (evt) => {
         setDescription(evt.target.value);
-    }
+    };
 
     //добавление и рендер введёных данных
     useEffect(() => {
         setName(currentUser.name || "");
         setDescription(currentUser.about || "");
-    }, [currentUser]);
+    }, [currentUser, isOpen]);
 
     //обработчик формы для передачи данных в запрос на сервер
     const handleSubmit = (e) => {
@@ -34,16 +34,16 @@ function EditProfilePopup({isOpen, onClose, onUpdateUser}) {
             name,
             about: description,
         });
-    }
+    };
 
-    return(
+    return (
         <PopupWithForm
             title="Редактировать профиль"
             name="edit"
-            btnText={ isLoading ? "Сохранение..." : "Сохранить"}
-            isOpen={ isOpen }
-            onClose={ onClose }
-            onSubmit={ handleSubmit }
+            btnText={isLoading ? "Сохранение..." : "Сохранить"}
+            isOpen={isOpen}
+            onClose={onClose}
+            onSubmit={handleSubmit}
         >
             <fieldset className="popup__form-fieldset popup__form-fieldset_edit">
                 <input
@@ -55,8 +55,8 @@ function EditProfilePopup({isOpen, onClose, onUpdateUser}) {
                     minLength="2"
                     maxLength="40"
                     required
-                    onChange={ handleInputName }
-                    value={ name }
+                    onChange={handleInputName}
+                    value={name}
                 />
                 <span
                     className="error-message error-message_active"
@@ -71,8 +71,8 @@ function EditProfilePopup({isOpen, onClose, onUpdateUser}) {
                     minLength="2"
                     maxLength="200"
                     required
-                    onChange={ handleInputDescription }
-                    value={ description }
+                    onChange={handleInputDescription}
+                    value={description}
                 />
                 <span
                     className="error-message error-message_active"
